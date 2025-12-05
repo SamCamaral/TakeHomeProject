@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --lk-va-bar-width: 72px;
+  --lk-control-bar-height: unset;
+  --bg-primary: #EAE5DE;
+  --text-primary: #28292A;
+  --text-secondary: #333333;
+}
+
+.agent-visualizer > .lk-audio-bar {
+  width: 72px;
+}
+
+.lk-agent-control-bar {
+  @apply border-t-0 p-0 h-min;
+  background-color: transparent !important;
+  color: white;
+}
+
+.lk-agent-control-bar button {
+  color: white;
+  background-color: transparent !important;
+}
+
+.lk-agent-control-bar > div {
+  background-color: transparent !important;
+}
+
+.lk-agent-control-bar svg {
+  color: white;
+}
+
+.lk-disconnect-button {
+  height: 36px;
+  width: 36px;
+  background-color: #B3261E;
+  border: 0;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 0;
+  margin: 0;
+  min-width: 36px;
+}
+
+.lk-disconnect-button:hover {
+  background-color: #B3261E;
+  opacity: 0.9;
+}
+
+.lk-disconnect-button svg {
+  color: white;
+  stroke: white;
+}
+
+/* Pixel-perfect design from Figma */
+body {
+  background: linear-gradient(0deg, #EAE5DE 0%, #EAE5DE 100%);
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Custom fonts */
+@font-face {
+  font-family: "Perfectly Nineties";
+  src: url("/fonts/PerfectlyNineties-Regular.woff2") format("woff2"),
+       url("/fonts/PerfectlyNineties-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suisse Int'l";
+  src: url("/fonts/SuisseIntl-Regular.woff2") format("woff2"),
+       url("/fonts/SuisseIntl-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TX-02";
+  src: url("/fonts/TX-02.woff2") format("woff2"),
+       url("/fonts/TX-02.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Wishlist grid responsive */
+@media (max-width: 1200px) {
+  .wishlist-grid {
+    grid-template-columns: repeat(4, 275px) !important;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .wishlist-grid {
+    grid-template-columns: repeat(2, 275px) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .wishlist-grid {
+    grid-template-columns: repeat(1, 275px) !important;
+  }
+}
+
+/* Letter typing animation */
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
