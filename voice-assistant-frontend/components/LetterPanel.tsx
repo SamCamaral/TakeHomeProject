@@ -70,7 +70,7 @@ export default function LetterPanel({
 
   const textToDisplay = displayedText || letter.content || "";
   const markerIndex = textToDisplay.indexOf(PRODUCTS_MARKER);
-  const hasProducts = markerIndex !== -1 && letter.products && letter.products.length > 0;
+  const hasProducts = markerIndex !== -1 && !!letter.products && letter.products.length > 0;
 
   return (
     <motion.div
