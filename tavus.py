@@ -4,13 +4,13 @@ title: Tavus Avatar
 category: avatars
 tags: [avatar, openai, deepgram, tavus]
 difficulty: intermediate
-description: Shows how to create a tavus avatar that can help a user learn about the Fall of the Roman Empire using flash cards and quizzes.
+description: Shows how to create a tavus avatar that can help users write letters to Santa and play Rock, Paper, Scissors.
 demonstrates:
   - Creating a new tavus avatar session
-  - Using RPC to send messages to the client for flash cards and quizzes using `perform_rpc`
+  - Using RPC to send messages to the client for letters, wishlist, and games using `perform_rpc`
   - Using `register_rpc_method` to register the RPC methods so that the agent can receive messages from the client
-  - Using UserData to store state for the cards and the quizzes
-  - Using custom data classes to represent the flash cards and quizzes
+  - Using UserData to store state for the wishlist and letters
+  - Using custom data classes to represent products and letters
 ---
 """
 import logging
@@ -43,14 +43,6 @@ if not eleven_api_key:
 else:
     logger.info("ElevenLabs API key found.")
 
-class QuizAnswerDict(TypedDict):
-    text: str
-    is_correct: bool
-
-class QuizQuestionDict(TypedDict):
-    text: str
-    answers: List[QuizAnswerDict]
-
 @dataclass
 class FlashCard:
     """Class to represent a flash card."""
@@ -58,26 +50,6 @@ class FlashCard:
     question: str
     answer: str
     is_flipped: bool = False
-
-@dataclass
-class QuizAnswer:
-    """Class to represent a quiz answer option."""
-    id: str
-    text: str
-    is_correct: bool
-
-@dataclass
-class QuizQuestion:
-    """Class to represent a quiz question."""
-    id: str
-    text: str
-    answers: List[QuizAnswer]
-
-@dataclass
-class Quiz:
-    """Class to represent a quiz."""
-    id: str
-    questions: List[QuizQuestion]
 
 @dataclass
 class Product:
@@ -102,13 +74,12 @@ class UserData:
     """Class to store user data during a session."""
     ctx: Optional[JobContext] = None
     flash_cards: List[FlashCard] = field(default_factory=list)
-    quizzes: List[Quiz] = field(default_factory=list)
     wishlist: List[Product] = field(default_factory=list)
     letter: Optional[Letter] = None
 
     def reset(self) -> None:
         """Reset session data."""
-        # Keep flash cards and quizzes intact
+        # Keep flash cards intact
 
     def add_flash_card(self, question: str, answer: str) -> FlashCard:
         """Add a new flash card to the collection."""
@@ -134,62 +105,6 @@ class UserData:
             card.is_flipped = not card.is_flipped
             return card
         return None
-
-    def add_quiz(self, questions: List[QuizQuestionDict]) -> Quiz:
-        """Add a new quiz to the collection."""
-        quiz_questions = []
-        for q in questions:
-            answers = []
-            for a in q["answers"]:
-                answers.append(QuizAnswer(
-                    id=str(uuid.uuid4()),
-                    text=a["text"],
-                    is_correct=a["is_correct"]
-                ))
-            quiz_questions.append(QuizQuestion(
-                id=str(uuid.uuid4()),
-                text=q["text"],
-                answers=answers
-            ))
-
-        quiz = Quiz(
-            id=str(uuid.uuid4()),
-            questions=quiz_questions
-        )
-        self.quizzes.append(quiz)
-        return quiz
-
-    def get_quiz(self, quiz_id: str) -> Optional[Quiz]:
-        """Get a quiz by ID."""
-        for quiz in self.quizzes:
-            if quiz.id == quiz_id:
-                return quiz
-        return None
-
-    def check_quiz_answers(self, quiz_id: str, user_answers: dict) -> List[tuple]:
-        """Check user's quiz answers and return results."""
-        quiz = self.get_quiz(quiz_id)
-        if not quiz:
-            return []
-
-        results = []
-        for question in quiz.questions:
-            user_answer_id = user_answers.get(question.id)
-
-            # Find the selected answer and the correct answer
-            selected_answer = None
-            correct_answer = None
-
-            for answer in question.answers:
-                if answer.id == user_answer_id:
-                    selected_answer = answer
-                if answer.is_correct:
-                    correct_answer = answer
-
-            is_correct = selected_answer and selected_answer.is_correct
-            results.append((question, selected_answer, correct_answer, is_correct))
-
-        return results
 
     def add_product(self, product_data: dict) -> Product:
         """Add a product to the wishlist."""
@@ -408,68 +323,6 @@ class AvatarAgent(Agent):
         )
 
         return f"I've flipped the flash card to show the {'answer' if card.is_flipped else 'question'}"
-
-    @function_tool
-    async def create_quiz(self, context: RunContext[UserData], questions: List[QuizQuestionDict]):
-        """Create a new quiz with multiple choice questions and display it to the user.
-
-        Args:
-            questions: A list of question objects. Each question object should have:
-                - text: The question text
-                - answers: A list of answer objects, each with:
-                    - text: The answer text
-                    - is_correct: Boolean indicating if this is the correct answer
-        """
-        userdata = context.userdata
-        quiz = userdata.add_quiz(questions)
-
-        # Get the room from the userdata
-        if not userdata.ctx or not userdata.ctx.room:
-            return f"Created a quiz, but couldn't access the room to send it."
-
-        room = userdata.ctx.room
-
-        # Get the first participant in the room (should be the client)
-        participants = room.remote_participants
-        if not participants:
-            return f"Created a quiz, but no participants found to send it to."
-
-        # Get the first participant from the dictionary of remote participants
-        participant = next(iter(participants.values()), None)
-        if not participant:
-            return f"Created a quiz, but couldn't get the first participant."
-
-        # Format questions for client
-        client_questions = []
-        for q in quiz.questions:
-            client_answers = []
-            for a in q.answers:
-                client_answers.append({
-                    "id": a.id,
-                    "text": a.text
-                })
-            client_questions.append({
-                "id": q.id,
-                "text": q.text,
-                "answers": client_answers
-            })
-
-        payload = {
-            "action": "show",
-            "id": quiz.id,
-            "questions": client_questions
-        }
-
-        # Make sure payload is properly serialized
-        json_payload = json.dumps(payload)
-        logger.info(f"Sending quiz payload: {json_payload}")
-        await room.local_participant.perform_rpc(
-            destination_identity=participant.identity,
-            method="client.quiz",
-            payload=json_payload
-        )
-
-        return f"I've created a quiz with {len(questions)} questions. Please answer them when you're ready."
 
     @function_tool
     async def add_gift_to_wishlist(self, context: RunContext[UserData], gift_name: str):
@@ -1282,91 +1135,11 @@ async def entrypoint(ctx: JobContext):
             logger.error(f"Error handling flip flash card: {e}")
             return f"error: {str(e)}"
 
-    # Register RPC method for handling quiz submissions
-    async def handle_submit_quiz(rpc_data):
-        try:
-            logger.info(f"Received quiz submission payload: {rpc_data}")
-
-            # Extract the payload from the RpcInvocationData object
-            payload_str = rpc_data.payload
-            logger.info(f"Extracted quiz submission string: {payload_str}")
-
-            # Parse the JSON payload
-            payload_data = json.loads(payload_str)
-            logger.info(f"Parsed quiz submission data: {payload_data}")
-
-            quiz_id = payload_data.get("id")
-            user_answers = payload_data.get("answers", {})
-
-            if not quiz_id:
-                logger.error("No quiz ID found in payload")
-                return "error: No quiz ID found in payload"
-
-            # Check the quiz answers
-            quiz_results = userdata.check_quiz_answers(quiz_id, user_answers)
-            if not quiz_results:
-                logger.error(f"Quiz with ID {quiz_id} not found")
-                return "error: Quiz not found"
-
-            # Count correct answers
-            correct_count = sum(1 for _, _, _, is_correct in quiz_results if is_correct)
-            total_count = len(quiz_results)
-
-            # Create a verbal response for the agent to say
-            result_summary = f"You got {correct_count} out of {total_count} questions correct."
-
-            # Generate feedback for each question
-            feedback_details = []
-            for question, selected_answer, correct_answer, is_correct in quiz_results:
-                if is_correct:
-                    feedback = f"Question: {question.text}\nYour answer: {selected_answer.text} ✓ Correct!"
-                else:
-                    feedback = f"Question: {question.text}\nYour answer: {selected_answer.text if selected_answer else 'None'} ✗ Incorrect. The correct answer is: {correct_answer.text}"
-
-                    # Create a flash card for incorrectly answered questions
-                    card = userdata.add_flash_card(question.text, correct_answer.text)
-                    participant = next(iter(ctx.room.remote_participants.values()), None)
-                    if participant:
-                        flash_payload = {
-                            "action": "show",
-                            "id": card.id,
-                            "question": card.question,
-                            "answer": card.answer,
-                            "index": len(userdata.flash_cards) - 1
-                        }
-                        json_flash_payload = json.dumps(flash_payload)
-                        await ctx.room.local_participant.perform_rpc(
-                            destination_identity=participant.identity,
-                            method="client.flashcard",
-                            payload=json_flash_payload
-                        )
-
-                feedback_details.append(feedback)
-
-            detailed_feedback = "\n\n".join(feedback_details)
-            full_response = f"{result_summary}\n\n{detailed_feedback}"
-
-            # Have the agent say the results
-            session.say(full_response)
-
-            return "success"
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error for quiz submission payload '{rpc_data.payload}': {e}")
-            return f"error: {str(e)}"
-        except Exception as e:
-            logger.error(f"Error handling quiz submission: {e}")
-            return f"error: {str(e)}"
-
     # Register RPC methods - The method names need to match exactly what the client is calling
     logger.info("Registering RPC methods")
     ctx.room.local_participant.register_rpc_method(
         "agent.flipFlashCard",
         handle_flip_flash_card
-    )
-
-    ctx.room.local_participant.register_rpc_method(
-        "agent.submitQuiz",
-        handle_submit_quiz
     )
 
     # Register RPC method for handling game choices
