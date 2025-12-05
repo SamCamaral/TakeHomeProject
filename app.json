@@ -1,0 +1,63 @@
+{
+  "name": "Tavus Santa Wishlist",
+  "description": "Voice assistant with Tavus avatar for Santa's wishlist",
+  "repository": "https://github.com/your-username/your-repo",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-1x"
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "standard-1x"
+    }
+  },
+  "env": {
+    "LIVEKIT_URL": {
+      "required": true,
+      "description": "LiveKit server URL (e.g., wss://your-project.livekit.cloud)"
+    },
+    "LIVEKIT_API_KEY": {
+      "required": true,
+      "description": "LiveKit API key"
+    },
+    "LIVEKIT_API_SECRET": {
+      "required": true,
+      "description": "LiveKit API secret"
+    },
+    "OPENAI_API_KEY": {
+      "required": true,
+      "description": "OpenAI API key"
+    },
+    "ELEVEN_API_KEY": {
+      "required": false,
+      "description": "ElevenLabs API key (also accepts ELEVENLABS_API_KEY)"
+    },
+    "ELEVENLABS_API_KEY": {
+      "required": false,
+      "description": "ElevenLabs API key (alternative to ELEVEN_API_KEY)"
+    },
+    "ASSEMBLYAI_API_KEY": {
+      "required": true,
+      "description": "AssemblyAI API key"
+    },
+    "TAVUS_API_KEY": {
+      "required": true,
+      "description": "Tavus API key"
+    },
+    "TAVUS_REPLICA_ID": {
+      "required": true,
+      "description": "Tavus replica ID (e.g., r9d30b0e55ac)",
+      "value": "r9d30b0e55ac"
+    }
+  }
+}
+

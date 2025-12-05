@@ -1,0 +1,58 @@
+{
+  "name": "Tavus Voice Assistant",
+  "description": "Voice assistant with Tavus avatar",
+  "repository": "https://github.com/your-username/your-repo",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-1x"
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "standard-1x"
+    }
+  },
+  "env": {
+    "LIVEKIT_URL": {
+      "required": true,
+      "description": "LiveKit server URL"
+    },
+    "LIVEKIT_API_KEY": {
+      "required": true,
+      "description": "LiveKit API key"
+    },
+    "LIVEKIT_API_SECRET": {
+      "required": true,
+      "description": "LiveKit API secret"
+    },
+    "OPENAI_API_KEY": {
+      "required": true,
+      "description": "OpenAI API key"
+    },
+    "ELEVENLABS_API_KEY": {
+      "required": true,
+      "description": "ElevenLabs API key"
+    },
+    "ASSEMBLYAI_API_KEY": {
+      "required": true,
+      "description": "AssemblyAI API key"
+    },
+    "TAVUS_API_KEY": {
+      "required": true,
+      "description": "Tavus API key"
+    },
+    "TAVUS_REPLICA_ID": {
+      "required": true,
+      "description": "Tavus replica ID"
+    }
+  }
+}
+

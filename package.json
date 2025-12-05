@@ -1,0 +1,13 @@
+{
+  "name": "tavus-santa-wishlist",
+  "version": "1.0.0",
+  "description": "Santa Wishlist with Tavus Avatar - Full Stack Application",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "scripts": {
+    "heroku-postbuild": "cd voice-assistant-frontend && npm install && npm run build"
+  }
+}
+
