@@ -12,7 +12,6 @@ export default function InfoIcon() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       style={{
-        imageRendering: "pixelated",
         imageRendering: "crisp-edges",
       }}
     >
