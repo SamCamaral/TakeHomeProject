@@ -1,3 +1,3 @@
-web: cd voice-assistant-frontend && npm run start
+web: bash start-web.sh
 worker: python tavus.py dev
 
