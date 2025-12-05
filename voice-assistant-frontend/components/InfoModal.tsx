@@ -89,7 +89,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                       <span className="text-2xl mr-3">🎁</span>
                       <div>
                         <strong>Add Gifts to Your Wishlist:</strong> Tell Santa what you want for Christmas, 
-                        and he'll search for similar products and add them to your wishlist automatically.
+                        and he&apos;ll search for similar products and add them to your wishlist automatically.
                       </div>
                     </li>
                     <li className="flex items-start">
@@ -138,45 +138,45 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     <div>
                       <strong className="text-gray-800">To add a gift:</strong>
                       <ul className="list-disc list-inside ml-2 mt-1 text-gray-700 space-y-1">
-                        <li>"I want an iPhone for Christmas"</li>
-                        <li>"Can you add AirPods to my wishlist?"</li>
-                        <li>"I'd like a gaming laptop"</li>
+                        <li>&quot;I want an iPhone for Christmas&quot;</li>
+                        <li>&quot;Can you add AirPods to my wishlist?&quot;</li>
+                        <li>&quot;I&apos;d like a gaming laptop&quot;</li>
                       </ul>
                     </div>
                     <div>
                       <strong className="text-gray-800">To create a letter:</strong>
                       <ul className="list-disc list-inside ml-2 mt-1 text-gray-700 space-y-1">
-                        <li>"Santa, help me create a letter for my dad"</li>
-                        <li>"Can you write a letter to my mom telling her I love her?"</li>
+                        <li>&quot;Santa, help me create a letter for my dad&quot;</li>
+                        <li>&quot;Can you write a letter to my mom telling her I love her?&quot;</li>
                       </ul>
                     </div>
                     <div>
                       <strong className="text-gray-800">To edit a letter:</strong>
                       <ul className="list-disc list-inside ml-2 mt-1 text-gray-700 space-y-1">
-                        <li>"Add that I'm excited to see them"</li>
-                        <li>"Make the letter more personal"</li>
-                        <li>"Include all my gifts in the letter"</li>
+                        <li>&quot;Add that I&apos;m excited to see them&quot;</li>
+                        <li>&quot;Make the letter more personal&quot;</li>
+                        <li>&quot;Include all my gifts in the letter&quot;</li>
                       </ul>
                     </div>
                     <div>
                       <strong className="text-gray-800">To play a game:</strong>
                       <ul className="list-disc list-inside ml-2 mt-1 text-gray-700 space-y-1">
-                        <li>"I want to play Rock, Paper, Scissors with you"</li>
-                        <li>"Let's play Rock, Paper, Scissors"</li>
+                        <li>&quot;I want to play Rock, Paper, Scissors with you&quot;</li>
+                        <li>&quot;Let&apos;s play Rock, Paper, Scissors&quot;</li>
                       </ul>
                     </div>
                     <div>
                       <strong className="text-gray-800">To get recommendations:</strong>
                       <ul className="list-disc list-inside ml-2 mt-1 text-gray-700 space-y-1">
-                        <li>"Can you recommend similar products?"</li>
-                        <li>"What else might I like?"</li>
+                        <li>&quot;Can you recommend similar products?&quot;</li>
+                        <li>&quot;What else might I like?&quot;</li>
                       </ul>
                     </div>
                     <div>
                       <strong className="text-gray-800">To download PDF:</strong>
                       <ul className="list-disc list-inside ml-2 mt-1 text-gray-700 space-y-1">
-                        <li>"Download my letter as PDF"</li>
-                        <li>"Export the letter to PDF"</li>
+                        <li>&quot;Download my letter as PDF&quot;</li>
+                        <li>&quot;Export the letter to PDF&quot;</li>
                       </ul>
                     </div>
                   </div>
@@ -199,7 +199,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     </li>
                     <li className="flex items-start">
                       <span className="text-[#28292A] mr-2">•</span>
-                      <span>When adding gifts, be specific about the item name (e.g., "iPhone" instead of "new phone")</span>
+                      <span>When adding gifts, be specific about the item name (e.g., &quot;iPhone&quot; instead of &quot;new phone&quot;)</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-[#28292A] mr-2">•</span>
