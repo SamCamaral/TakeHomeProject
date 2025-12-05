@@ -322,7 +322,7 @@ function DisconnectedState({ onConnectButtonClicked }: DisconnectedStateProps) {
       {onConnectButtonClicked && (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-10">
           <h2 className="text-white text-center font-['Perfectly_Nineties'] text-5xl font-normal leading-[72px] drop-shadow-[2px_2px_8px_rgba(0,0,0,0.8)] w-[600px] h-[72px] flex flex-col justify-center m-0">
-            Santa's helper is calling you
+            Santa&apos;s helper is calling you
           </h2>
           <motion.button
             initial={{ opacity: 0, y: 10 }}

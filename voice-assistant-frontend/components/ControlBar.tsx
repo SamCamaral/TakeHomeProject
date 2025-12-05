@@ -8,15 +8,11 @@ import {
 } from "@livekit/components-react";
 import { CloseIcon } from "./CloseIcon";
 
-interface ControlBarProps {
-  onConnectButtonClicked: () => void;
-}
-
 /**
  * Control bar component for agent connection
  * Only visible when agent is disconnected
  */
-export default function ControlBar({ onConnectButtonClicked }: ControlBarProps) {
+export default function ControlBar() {
   const { state: agentState } = useVoiceAssistant();
 
   return (

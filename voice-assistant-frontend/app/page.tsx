@@ -256,7 +256,7 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
       {/* Control Bar - Only show when disconnected */}
       {agentState === "disconnected" && (
         <div className="fixed bottom-5 right-5 z-[100]">
-          <ControlBar onConnectButtonClicked={props.onConnectButtonClicked} />
+          <ControlBar />
         </div>
       )}
 
