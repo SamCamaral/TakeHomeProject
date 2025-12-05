@@ -3,7 +3,6 @@
   "outputDirectory": "voice-assistant-frontend/.next",
   "devCommand": "cd voice-assistant-frontend && npm run dev",
   "installCommand": "cd voice-assistant-frontend && npm install",
-  "framework": "nextjs",
-  "rootDirectory": "voice-assistant-frontend"
+  "framework": "nextjs"
 }
 
