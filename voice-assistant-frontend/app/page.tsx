@@ -65,7 +65,6 @@ export default function Page() {
 function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
   const { state: agentState } = useVoiceAssistant();
   const room = useRoomContext();
-  const [wishlistProducts, setWishlistProducts] = useState<WishlistProduct[]>([]);
   const [letter, setLetter] = useState<Letter | null>(null);
   const [isLetterVisible, setIsLetterVisible] = useState(false);
   const [shouldExportPDF, setShouldExportPDF] = useState(false);
@@ -81,12 +80,8 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
   // Centralized RPC handlers using custom hook
   useRpcHandlers({
     room,
-    onWishlistUpdate: (product) => {
-      setWishlistProducts((prev) => {
-        const exists = prev.some((p) => p.id === product.id);
-        if (exists) return prev;
-        return [...prev, product];
-      });
+    onWishlistUpdate: () => {
+      // Products are added directly to the letter, no need to track separately
     },
     onLetterUpdate: (updatedLetter) => {
       setLetter(updatedLetter);
@@ -304,12 +299,7 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
         <RecommendationsSection 
           products={recommendedProducts}
           onAddToWishlist={(product) => {
-            // Add to wishlist and remove from recommendations
-            setWishlistProducts(prev => {
-              const exists = prev.some(p => p.id === product.id);
-              if (exists) return prev;
-              return [...prev, { ...product, isRecommendation: false }];
-            });
+            // Remove from recommendations (product will be added to letter by backend)
             setRecommendedProducts(prev => prev.filter(p => p.id !== product.id));
           }}
         />
