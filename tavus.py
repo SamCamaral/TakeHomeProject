@@ -44,14 +44,6 @@ else:
     logger.info("ElevenLabs API key found.")
 
 @dataclass
-class FlashCard:
-    """Class to represent a flash card."""
-    id: str
-    question: str
-    answer: str
-    is_flipped: bool = False
-
-@dataclass
 class Product:
     """Class to represent a product in the wishlist."""
     id: str
@@ -73,38 +65,11 @@ class Letter:
 class UserData:
     """Class to store user data during a session."""
     ctx: Optional[JobContext] = None
-    flash_cards: List[FlashCard] = field(default_factory=list)
     wishlist: List[Product] = field(default_factory=list)
     letter: Optional[Letter] = None
 
     def reset(self) -> None:
         """Reset session data."""
-        # Keep flash cards intact
-
-    def add_flash_card(self, question: str, answer: str) -> FlashCard:
-        """Add a new flash card to the collection."""
-        card = FlashCard(
-            id=str(uuid.uuid4()),
-            question=question,
-            answer=answer
-        )
-        self.flash_cards.append(card)
-        return card
-
-    def get_flash_card(self, card_id: str) -> Optional[FlashCard]:
-        """Get a flash card by ID."""
-        for card in self.flash_cards:
-            if card.id == card_id:
-                return card
-        return None
-
-    def flip_flash_card(self, card_id: str) -> Optional[FlashCard]:
-        """Flip a flash card by ID."""
-        card = self.get_flash_card(card_id)
-        if card:
-            card.is_flipped = not card.is_flipped
-            return card
-        return None
 
     def add_product(self, product_data: dict) -> Product:
         """Add a product to the wishlist."""
@@ -234,95 +199,6 @@ class AvatarAgent(Agent):
             ),
             vad=vad_instance,
         )
-
-    @function_tool
-    async def create_flash_card(self, context: RunContext[UserData], question: str, answer: str):
-        """Create a new flash card and display it to the user.
-
-        Args:
-            question: The question or front side of the flash card
-            answer: The answer or back side of the flash card
-        """
-        userdata = context.userdata
-        card = userdata.add_flash_card(question, answer)
-
-        # Get the room from the userdata
-        if not userdata.ctx or not userdata.ctx.room:
-            return f"Created a flash card, but couldn't access the room to send it."
-
-        room = userdata.ctx.room
-
-        # Get the first participant in the room (should be the client)
-        participants = room.remote_participants
-        if not participants:
-            return f"Created a flash card, but no participants found to send it to."
-
-        # Get the first participant from the dictionary of remote participants
-        participant = next(iter(participants.values()), None)
-        if not participant:
-            return f"Created a flash card, but couldn't get the first participant."
-        payload = {
-            "action": "show",
-            "id": card.id,
-            "question": card.question,
-            "answer": card.answer,
-            "index": len(userdata.flash_cards) - 1
-        }
-
-        # Make sure payload is properly serialized
-        json_payload = json.dumps(payload)
-        logger.info(f"Sending flash card payload: {json_payload}")
-        await room.local_participant.perform_rpc(
-            destination_identity=participant.identity,
-            method="client.flashcard",
-            payload=json_payload
-        )
-
-        return f"I've created a flash card with the question: '{question}'"
-
-    @function_tool
-    async def flip_flash_card(self, context: RunContext[UserData], card_id: str):
-        """Flip a flash card to show the answer or question.
-
-        Args:
-            card_id: The ID of the flash card to flip
-        """
-        userdata = context.userdata
-        card = userdata.flip_flash_card(card_id)
-
-        if not card:
-            return f"Flash card with ID {card_id} not found."
-
-        # Get the room from the userdata
-        if not userdata.ctx or not userdata.ctx.room:
-            return f"Flipped the flash card, but couldn't access the room to send it."
-
-        room = userdata.ctx.room
-
-        # Get the first participant in the room (should be the client)
-        participants = room.remote_participants
-        if not participants:
-            return f"Flipped the flash card, but no participants found to send it to."
-
-        # Get the first participant from the dictionary of remote participants
-        participant = next(iter(participants.values()), None)
-        if not participant:
-            return f"Flipped the flash card, but couldn't get the first participant."
-        payload = {
-            "action": "flip",
-            "id": card.id
-        }
-
-        # Make sure payload is properly serialized
-        json_payload = json.dumps(payload)
-        logger.info(f"Sending flip card payload: {json_payload}")
-        await room.local_participant.perform_rpc(
-            destination_identity=participant.identity,
-            method="client.flashcard",
-            payload=json_payload
-        )
-
-        return f"I've flipped the flash card to show the {'answer' if card.is_flipped else 'question'}"
 
     @function_tool
     async def add_gift_to_wishlist(self, context: RunContext[UserData], gift_name: str):
@@ -1101,46 +977,8 @@ async def entrypoint(ctx: JobContext):
         persona_id="p28bd1d78e56"
     )
 
-    # Register RPC method for flipping flash cards from client
-    async def handle_flip_flash_card(rpc_data):
-        try:
-            logger.info(f"Received flash card flip payload: {rpc_data}")
-
-            # Extract the payload from the RpcInvocationData object
-            payload_str = rpc_data.payload
-            logger.info(f"Extracted payload string: {payload_str}")
-
-            # Parse the JSON payload
-            payload_data = json.loads(payload_str)
-            logger.info(f"Parsed payload data: {payload_data}")
-
-            card_id = payload_data.get("id")
-
-            if card_id:
-                card = userdata.flip_flash_card(card_id)
-                if card:
-                    logger.info(f"Flipped flash card {card_id}, is_flipped: {card.is_flipped}")
-                    # Send a message to the user via the agent, we're disabling this for now.
-                    # session.generate_reply(user_input=(f"Please describe the {'answer' if card.is_flipped else 'question'}"))
-                else:
-                    logger.error(f"Card with ID {card_id} not found")
-            else:
-                logger.error("No card ID found in payload")
-
-            return None
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error for payload '{rpc_data.payload}': {e}")
-            return f"error: {str(e)}"
-        except Exception as e:
-            logger.error(f"Error handling flip flash card: {e}")
-            return f"error: {str(e)}"
-
     # Register RPC methods - The method names need to match exactly what the client is calling
     logger.info("Registering RPC methods")
-    ctx.room.local_participant.register_rpc_method(
-        "agent.flipFlashCard",
-        handle_flip_flash_card
-    )
 
     # Register RPC method for handling game choices
     async def handle_game_choice(rpc_data):
