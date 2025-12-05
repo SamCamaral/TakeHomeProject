@@ -6,6 +6,8 @@ import LetterPanel from "@/components/LetterPanel";
 import RecommendationsSection from "@/components/RecommendationsSection";
 import AgentVisualizer from "@/components/AgentVisualizer";
 import ControlBar from "@/components/ControlBar";
+import InfoIcon from "@/components/InfoIcon";
+import InfoModal from "@/components/InfoModal";
 import {
   RoomAudioRenderer,
   RoomContext,
@@ -76,6 +78,7 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
     result: null,
     message: "",
   });
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   // Centralized RPC handlers using custom hook
   useRpcHandlers({
@@ -254,6 +257,21 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
           <ControlBar />
         </div>
       )}
+
+      {/* Info Icon - Always visible, bottom left */}
+      <button
+        onClick={() => setIsInfoModalOpen(true)}
+        className="fixed bottom-[30px] left-[30px] z-[100] bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all hover:scale-110"
+        style={{
+          filter: "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))",
+        }}
+        aria-label="Information"
+      >
+        <InfoIcon />
+      </button>
+
+      {/* Info Modal */}
+      <InfoModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
 
       {/* Letter Panel - Right side */}
       <AnimatePresence>
